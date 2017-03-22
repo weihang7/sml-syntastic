@@ -1,7 +1,7 @@
 "============================================================================
 "File:        smlnj.vim
 "Description: Syntax checking plugin for syntastic.vim
-"Maintainer:  Izaak Meckler <ihmeckle at gmail dot com>
+"Maintainer:  LCD 47 <lcd047 at gmail dot com>
 "License:     This program is free software. It comes without any warranty,
 "             to the extent permitted by applicable law. You can redistribute
 "             it and/or modify it under the terms of the Do What The Fuck You
@@ -19,15 +19,22 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! SyntaxCheckers_sml_smlnj_GetLocList() dict
-    let makeprg = self.makeprgBuild({
-        \ 'exe': self.getExec()})
+    if !empty(glob("sources.cm"))
+        let makeprg = self.makeprgBuild({
+            \ 'args': '-m',
+            \ 'fname': 'sources.cm' })
+    else
+        let makeprg = self.makeprgBuild({})
+    endif
 
     let errorformat =
-        \ '%A%f:%l.%c %trror: %m,' .
-        \ '%A%f:%l.%c-%*\d.%*\d %trror: %m,' .
-        \ '%A%f:%l.%c %tarning: %m,' .
-        \ '%A%f:%l.%c-%*\d.%*\d %tarning: %m,' .
-        \ '%C  %m'
+        \ '%E  %m%f:%l%\%.%c-%\d%\+%\%.%\d%\+,' .
+        \ '%E%f:%l%\%.%c %trror: %m,' .
+        \ '%E%f:%l%\%.%c-%\d%\+%\%.%\d%\+ %trror: %m,' .
+        \ '%W%f:%l%\%.%c %tarning: %m,' .
+        \ '%W%f:%l%\%.%c-%\d%\+%\%.%\d%\+ %tarning: %m,' .
+        \ '%C%\s%\+%m,' .
+        \ '%-G%.%#'
 
     return SyntasticMake({
         \ 'makeprg': makeprg,
@@ -39,9 +46,9 @@ endfunction
 call g:SyntasticRegistry.CreateAndRegisterChecker({
     \ 'filetype': 'sml',
     \ 'name': 'smlnj',
-    \ 'exec': 'sml' })
+    \ 'exec': 'sml'})
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" vim: set et sts=4 sw=4:
+" vim: set sw=4 sts=4 et fdm=marker:
